@@ -1,5 +1,7 @@
 # AWS-EKS---2048-app
 
+![image](https://github.com/anujatsamuel/AWS-EKS---2048-app/assets/138687534/bce9b8c7-aa34-49b5-b611-c64fc65405dd)
+
 Prerequsites :
 
 Install the AWS CLI:
