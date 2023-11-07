@@ -1,13 +1,17 @@
 **Install EKS**
+
 Please follow the prerequisites doc before this.
 
 **Install using Fargate**
+
 eksctl create cluster --name demo-cluster --region us-east-1 --fargate
 
 **Delete the cluster**
+
 eksctl delete cluster --name demo-cluster --region us-east-1
 
 **Create Fargate profile**
+
 eksctl create fargateprofile \
     --cluster demo-cluster \
     --region us-east-1 \
@@ -20,23 +24,27 @@ eksctl create fargateprofile \
 export cluster_name=demo-cluster
 oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5) 
 
-Check if there is an IAM OIDC provider configured already
+**Check if there is an IAM OIDC provider configured already**
+
 aws iam list-open-id-connect-providers | grep $oidc_id | cut -d "/" -f4\n
 
-If not, run the below command
+**If not, run the below command**
+
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
 
 **How to setup alb add on**
 
-Download IAM policy
+**Download IAM policy**
 
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
-Create IAM Policy
+
+**Create IAM Policy**
 
 aws iam create-policy \
     --policy-name AWSLoadBalancerControllerIAMPolicy \
     --policy-document file://iam_policy.json
-Create IAM Role
+    
+**Create IAM Role**
 
 eksctl create iamserviceaccount \
   --cluster=<your-cluster-name> \
@@ -46,14 +54,17 @@ eksctl create iamserviceaccount \
   --attach-policy-arn=arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
   
-Deploy ALB controller
-Add helm repo
+**Deploy ALB controller**
+
+**Add helm repo**
 
 helm repo add eks https://aws.github.io/eks-charts
-Update the repo
+
+**Update the repo**
 
 helm repo update eks
-Install
+
+**Install**
 
 helm install aws-load-balancer-controller eks/aws-load-balancer-controller \            
   -n kube-system \
@@ -63,7 +74,7 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set region=<region> \
   --set vpcId=<your-vpc-id>
   
-Verify that the deployments are running.
+**Verify that the deployments are running**
 
 kubectl get deployment -n kube-system aws-load-balancer-controller
 
