@@ -1,13 +1,13 @@
-Install EKS
+**Install EKS**
 Please follow the prerequisites doc before this.
 
-Install using Fargate
+**Install using Fargate**
 eksctl create cluster --name demo-cluster --region us-east-1 --fargate
 
-Delete the cluster
+**Delete the cluster**
 eksctl delete cluster --name demo-cluster --region us-east-1
 
-Create Fargate profile
+**Create Fargate profile**
 eksctl create fargateprofile \
     --cluster demo-cluster \
     --region us-east-1 \
@@ -15,7 +15,7 @@ eksctl create fargateprofile \
     --namespace game-2048
 
 
-commands to configure IAM OIDC provider
+**commands to configure IAM OIDC provider**
 
 export cluster_name=demo-cluster
 oidc_id=$(aws eks describe-cluster --name $cluster_name --query "cluster.identity.oidc.issuer" --output text | cut -d '/' -f 5) 
@@ -26,7 +26,8 @@ aws iam list-open-id-connect-providers | grep $oidc_id | cut -d "/" -f4\n
 If not, run the below command
 eksctl utils associate-iam-oidc-provider --cluster $cluster_name --approve
 
-How to setup alb add on
+**How to setup alb add on**
+
 Download IAM policy
 
 curl -O https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/install/iam_policy.json
@@ -44,6 +45,7 @@ eksctl create iamserviceaccount \
   --role-name AmazonEKSLoadBalancerControllerRole \
   --attach-policy-arn=arn:aws:iam::<your-aws-account-id>:policy/AWSLoadBalancerControllerIAMPolicy \
   --approve
+  
 Deploy ALB controller
 Add helm repo
 
@@ -60,11 +62,13 @@ helm install aws-load-balancer-controller eks/aws-load-balancer-controller \
   --set serviceAccount.name=aws-load-balancer-controller \
   --set region=<region> \
   --set vpcId=<your-vpc-id>
+  
 Verify that the deployments are running.
 
 kubectl get deployment -n kube-system aws-load-balancer-controller
 
-Deploy the deployment, service and Ingress
+**Deploy the deployment, service and Ingress**
+
 kubectl apply -f https://raw.githubusercontent.com/kubernetes-sigs/aws-load-balancer-controller/v2.5.4/docs/examples/2048/2048_full.yaml
 
 
